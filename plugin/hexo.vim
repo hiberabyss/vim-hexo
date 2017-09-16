@@ -9,8 +9,8 @@ if ( !exists('g:hexoRootPath') )
 endif
 
 "let g:hexoRootPath="/home/lizy/hexo/"
-let g:hexoPostPath=g:hexoRootPath . "source/_posts/"
-let g:hexoDraftPath=g:hexoRootPath . "source/_drafts/"
+let g:hexoPostPath = g:hexoRootPath . "source/_posts/"
+let g:hexoDraftPath = g:hexoRootPath . "source/_drafts/"
 
 fun! OpenHexoRootPath()
     execute "cd " . g:hexoRootPath
@@ -62,6 +62,14 @@ fun! NewHexoDraft(name)
     call OpenHexoDraftFile(filename)
 endfun
 
+function! HexoReadLayout(layout)
+	execute(printf("silent 0r !jinja2 %sscaffolds/%s.md -D date='%s'", g:hexoRootPath, a:layout, strftime("%F %T")))
+endfunction
+
+function! s:replaceSpaces(name)
+	return substitute(a:name, ' ', '-', 'g')
+endfunction
+
 fun! NewHexoPost(name)
     if(!executable('hexo'))
         echom 'no hexo found!'
@@ -69,11 +77,10 @@ fun! NewHexoPost(name)
     endif
 
     call OpenHexoRootPath()
-    let filename = GenerateFileName(g:hexoPostPath, a:name)
-
-    execute "!hexo new " . filename 
+    let filename = GenerateFileName(g:hexoPostPath, s:replaceSpaces(a:name))
 
     call OpenHexoPostFile(filename)
+	call HexoReadLayout("post")
 endfun
 
 fun! GenerateFileName(path, filename)
