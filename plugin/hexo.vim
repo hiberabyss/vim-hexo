@@ -8,6 +8,15 @@ if ( !exists('g:hexoRootPath') )
     fini
 endif
 
+function! s:EnvPrecheck()
+    if(! executable('hexo'))
+        echom 'no hexo found!'
+        finish
+    endif
+endfunction
+
+call s:EnvPrecheck()
+
 "let g:hexoRootPath="/home/lizy/hexo/"
 let g:hexoPostPath = g:hexoRootPath . "source/_posts/"
 let g:hexoDraftPath = g:hexoRootPath . "source/_drafts/"
@@ -49,17 +58,11 @@ fun! OpenHexoDraftFile(filename)
 endfun
 
 fun! NewHexoDraft(name)
-    if(!executable('hexo'))
-        echom 'no hexo found!'
-        return
-    endif
-
     call OpenHexoRootPath()
-    let filename = GenerateFileName(g:hexoDraftPath, a:name)
-
-    execute "!hexo new draft " . filename 
+    let filename = GenerateFileName(g:hexoPostPath, s:replaceSpaces(a:name))
 
     call OpenHexoDraftFile(filename)
+	call HexoReadLayout("draft")
 endfun
 
 function! HexoReadLayout(layout)
@@ -71,11 +74,6 @@ function! s:replaceSpaces(name)
 endfunction
 
 fun! NewHexoPost(name)
-    if(!executable('hexo'))
-        echom 'no hexo found!'
-        return
-    endif
-
     call OpenHexoRootPath()
     let filename = GenerateFileName(g:hexoPostPath, s:replaceSpaces(a:name))
 
@@ -105,17 +103,13 @@ fun! GenerateFileName(path, filename)
 endfun
 
 fun! HexoPublish(...)
-    if(executable('hexo'))
-        call OpenHexoRootPath()
-        if (a:0 == 1)
-            execute "!hexo publish " . a:1 
-        elseif (a:0 == 2)
-            execute "!hexo publish " . a:1 . a:2 
-        else
-            echom "Arguments Error!  HexoPublish [layout] <title>"
-        endif
-    elseif
-        echom 'no hexo found!'
+    call OpenHexoRootPath()
+    if (a:0 == 1)
+        execute "!hexo publish " . a:1 
+    elseif (a:0 == 2)
+        execute "!hexo publish " . a:1 . a:2 
+    else
+        echom "Arguments Error!  HexoPublish [layout] <title>"
     endif
 endfun
 
@@ -129,24 +123,16 @@ fun! HexoC()
 endfun
 
 fun! HexoG()
-    if(executable('hexo'))
-        call OpenHexoRootPath()
-        execute "!hexo clean"
-        execute "!hexo g"
-    elseif
-        echom 'no hexo found!'
-    endif
+    call OpenHexoRootPath()
+    execute "!hexo clean"
+    execute "!hexo g"
 endfun
 
 fun! HexoD()
-    if(executable('hexo'))
-        call OpenHexoRootPath()
-        execute "!hexo clean"
-        execute "!hexo g"
-        execute "!hexo d"
-    elseif
-        echom 'no hexo found!'
-    endif
+    call OpenHexoRootPath()
+    execute "!hexo clean"
+    execute "!hexo g"
+    execute "!hexo d"
 endfun
 
 command! HexoOpen :call OpenHexoPostPathAndNERDTree()
