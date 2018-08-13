@@ -3,23 +3,11 @@
 " Description: 这是一个跟hexo配合的插件
 " Maintainer:  
 " ============================================================================
-if ( !exists('g:hexoRootPath') )
-    echom "plugin vim-hexo error! please add g:hexoRootPath in .vimrc~~"
-    fini
-endif
+call hexo#EnvPrecheck()
 
-function! s:EnvPrecheck()
-    if(! executable('hexo'))
-        echom 'no hexo found!'
-        finish
-    endif
-endfunction
-
-call s:EnvPrecheck()
-
-"let g:hexoRootPath="/home/lizy/hexo/"
 let g:hexoPostPath = g:hexoRootPath . "source/_posts/"
 let g:hexoDraftPath = g:hexoRootPath . "source/_drafts/"
+let g:hexoHosts = ['localhost:4000', 'hiberabyss.github.io', 'hbliu.coding.me']
 
 fun! OpenHexoRootPath()
     execute "cd " . g:hexoRootPath
@@ -82,7 +70,6 @@ fun! NewHexoPost(name)
 endfun
 
 fun! GenerateFileName(path, filename)
-
     let fileList = split(globpath(a:path, a:filename . "*.md"), "\n")
 
     let max = 0
@@ -102,44 +89,9 @@ fun! GenerateFileName(path, filename)
     return max == 0 ? a:filename : a:filename . "-" . (max + 1)
 endfun
 
-fun! HexoPublish(...)
-    call OpenHexoRootPath()
-    if (a:0 == 1)
-        execute "!hexo publish " . a:1 
-    elseif (a:0 == 2)
-        execute "!hexo publish " . a:1 . a:2 
-    else
-        echom "Arguments Error!  HexoPublish [layout] <title>"
-    endif
-endfun
-
-fun! HexoC()
-    if(executable('hexo'))
-        call OpenHexoRootPath()
-        execute "!hexo clean"
-    elseif
-        echom 'no hexo found!'
-    endif
-endfun
-
-fun! HexoG()
-    call OpenHexoRootPath()
-    execute "!hexo clean"
-    execute "!hexo g"
-endfun
-
-fun! HexoD()
-    call OpenHexoRootPath()
-    execute "!hexo clean"
-    execute "!hexo g"
-    execute "!hexo d"
-endfun
-
+command! -nargs=0 HexoNewPostDir :call hexo#NewPostDir()
+command! -nargs=? HexoBrowse :call hexo#BrowsePage('<args>')
 command! HexoOpen :call OpenHexoPostPathAndNERDTree()
 command! HexoOpenDraft :call OpenHexoDraftPathAndNERDTree()
 command! -nargs=+ HexoNew :call NewHexoPost("<args>")
 command! -nargs=+ HexoNewDraft :call NewHexoDraft("<args>")
-command! -nargs=+ HexoPublish :call HexoPublish("<args>")
-command! HexoC :call HexoC()
-command! HexoG :call HexoG()
-command! HexoD :call HexoD()
