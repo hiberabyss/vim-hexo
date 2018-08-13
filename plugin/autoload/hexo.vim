@@ -1,7 +1,7 @@
 function! hexo#EnvPrecheck()
     if(! executable('hexo'))
-        echom 'no hexo found!'
-        finish
+        " echom 'no hexo found!'
+        return 1
     endif
 
     if ( !exists('g:hexoRootPath') )
